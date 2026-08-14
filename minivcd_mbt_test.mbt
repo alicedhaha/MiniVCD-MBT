@@ -447,6 +447,34 @@ test "csv export" {
 }
 
 ///|
+test "csv export one signal" {
+  let text =
+    #|$scope module top $end
+    #|$var wire 1 ! clk $end
+    #|$var wire 1 ? rst $end
+    #|$upscope $end
+    #|$enddefinitions $end
+    #|#0 0! 1?
+    #|#5 1!
+  let vcd = parse_ok(text)
+  let csv = @minivcd_mbt.export_signal_csv(vcd, "top.clk") catch {
+    _ => panic()
+  }
+  assert_eq(csv, "timestamp,signal,value\n0,top.clk,0\n5,top.clk,1\n")
+}
+
+///|
+test "csv export one signal rejects missing signal" {
+  let vcd = parse_ok(simple_vcd("#0 0!"))
+  try @minivcd_mbt.export_signal_csv(vcd, "top.nope") catch {
+    @minivcd_mbt.VcdError(message) =>
+      assert_true(message.contains("signal not found"))
+  } noraise {
+    _ => panic()
+  }
+}
+
+///|
 test "empty input is rejected" {
   expect_error("  \n\t", "empty VCD input")
 }
