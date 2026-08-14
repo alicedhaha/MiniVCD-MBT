@@ -7,6 +7,7 @@ fn print_help() -> Unit {
     #|  minivcd info <file.vcd>
     #|  minivcd signals <file.vcd>
     #|  minivcd changes <file.vcd> <full.signal.name>
+    #|  minivcd stats <file.vcd> <full.signal.name>
     #|  minivcd value <file.vcd> <full.signal.name> <timestamp>
     #|  minivcd export <file.vcd> <output.csv>
   println(help)
@@ -68,6 +69,29 @@ fn run(args : Array[String]) -> Unit raise @vcdlib.VcdError {
       let vcd = read_vcd(args[2])
       for change in @vcdlib.signal_changes(vcd, args[3]) {
         println("\{change.timestamp}\t\{change.value}")
+      }
+    }
+    "stats" => {
+      if args.length() != 4 {
+        raise @vcdlib.VcdError(
+          "usage: minivcd stats <file.vcd> <full.signal.name>",
+        )
+      }
+      let vcd = read_vcd(args[2])
+      let signal = match @vcdlib.find_signal(vcd, args[3]) {
+        Some(signal) => signal
+        None => raise @vcdlib.VcdError("signal not found: \{args[3]}")
+      }
+      let stats = @vcdlib.signal_stats(vcd, args[3])
+      println("Signal: \{signal.full_name}")
+      println("Type: \{signal.signal_type}")
+      println("Width: \{signal.width}")
+      println("Changes: \{stats.change_count}")
+      println("First change: \{show_time(stats.first_change_time)}")
+      println("Last change: \{show_time(stats.last_change_time)}")
+      if signal.width == 1 {
+        println("Rising edges: \{stats.rising_edges}")
+        println("Falling edges: \{stats.falling_edges}")
       }
     }
     "value" => {
