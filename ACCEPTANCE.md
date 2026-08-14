@@ -10,6 +10,8 @@ Date: 2026-08-14
 
 ## Reproduction Commands
 
+The repository also includes `scripts/verify.ps1`, which runs the same checks and demo commands in one pass on Windows.
+
 ```bash
 moon fmt --check
 moon check --target all --deny-warn
