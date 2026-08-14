@@ -1,0 +1,114 @@
+///|
+fn print_help() -> Unit {
+  let help =
+    #|MiniVCD-MBT - lightweight VCD waveform viewer
+    #|
+    #|Usage:
+    #|  minivcd info <file.vcd>
+    #|  minivcd signals <file.vcd>
+    #|  minivcd changes <file.vcd> <full.signal.name>
+    #|  minivcd value <file.vcd> <full.signal.name> <timestamp>
+    #|  minivcd export <file.vcd> <output.csv>
+  println(help)
+}
+
+///|
+fn read_vcd(path : String) -> @vcdlib.VcdFile raise @vcdlib.VcdError {
+  let text = @fs.read_file_to_string(path) catch {
+    @fs.IOError(message) =>
+      raise @vcdlib.VcdError("cannot read '\{path}': \{message}")
+  }
+  @vcdlib.parse_vcd(text)
+}
+
+///|
+fn show_time(value : Int64?) -> String {
+  match value {
+    Some(time) => time.to_string()
+    None => "n/a"
+  }
+}
+
+///|
+fn run(args : Array[String]) -> Unit raise @vcdlib.VcdError {
+  if args.length() < 2 {
+    print_help()
+    return
+  }
+  let command = args[1]
+  match command {
+    "info" => {
+      if args.length() != 3 {
+        raise @vcdlib.VcdError("usage: minivcd info <file.vcd>")
+      }
+      let vcd = read_vcd(args[2])
+      println("VCD File")
+      println("Timescale: \{vcd.timescale}")
+      println("Signals: \{vcd.signals.length()}")
+      println("Changes: \{vcd.changes.length()}")
+      println("Start time: \{show_time(@vcdlib.start_time(vcd))}")
+      println("End time: \{show_time(@vcdlib.end_time(vcd))}")
+    }
+    "signals" => {
+      if args.length() != 3 {
+        raise @vcdlib.VcdError("usage: minivcd signals <file.vcd>")
+      }
+      let vcd = read_vcd(args[2])
+      for signal in @vcdlib.list_signals(vcd) {
+        println("\{signal.full_name}\t\{signal.signal_type}\t\{signal.width}")
+      }
+    }
+    "changes" => {
+      if args.length() != 4 {
+        raise @vcdlib.VcdError(
+          "usage: minivcd changes <file.vcd> <full.signal.name>",
+        )
+      }
+      let vcd = read_vcd(args[2])
+      for change in @vcdlib.signal_changes(vcd, args[3]) {
+        println("\{change.timestamp}\t\{change.value}")
+      }
+    }
+    "value" => {
+      if args.length() != 5 {
+        raise @vcdlib.VcdError(
+          "usage: minivcd value <file.vcd> <full.signal.name> <timestamp>",
+        )
+      }
+      let timestamp = @string.parse_int64(args[4]) catch {
+        _ => raise @vcdlib.VcdError("invalid timestamp '\{args[4]}'")
+      }
+      let vcd = read_vcd(args[2])
+      match @vcdlib.value_at(vcd, args[3], timestamp) {
+        Some(value) => println("\{args[3]} @ \{timestamp} = \{value}")
+        None =>
+          raise @vcdlib.VcdError(
+            "no value for \{args[3]} at or before \{timestamp}",
+          )
+      }
+    }
+    "export" => {
+      if args.length() != 4 {
+        raise @vcdlib.VcdError("usage: minivcd export <file.vcd> <output.csv>")
+      }
+      let vcd = read_vcd(args[2])
+      let csv = @vcdlib.export_csv(vcd)
+      @fs.write_string_to_file(args[3], csv) catch {
+        @fs.IOError(message) =>
+          raise @vcdlib.VcdError("cannot write '\{args[3]}': \{message}")
+      }
+      println("Exported \{vcd.changes.length()} changes to \{args[3]}")
+    }
+    "help" | "--help" | "-h" => print_help()
+    _ => raise @vcdlib.VcdError("unknown command '\{command}'")
+  }
+}
+
+///|
+fn main {
+  try run(@env.args()) catch {
+    @vcdlib.VcdError(message) => println("Error: \{message}")
+  } noraise {
+    _ => ()
+  }
+}
