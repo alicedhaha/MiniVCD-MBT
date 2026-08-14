@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install MoonBit
         run: |
@@ -22,8 +22,11 @@ jobs:
       - name: Show toolchain
         run: moon version --all
 
+      - name: Resolve dependencies
+        run: moon update
+
       - name: Check
-        run: moon check
+        run: moon check --deny-warn
 
       - name: Test
         run: moon test
