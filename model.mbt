@@ -37,6 +37,15 @@ pub(all) struct SignalStats {
 } derive(Eq, @debug.Debug)
 
 ///|
+/// File-level counts and time bounds.
+pub(all) struct VcdSummary {
+  signal_count : Int
+  change_count : Int
+  start_time : Int64?
+  end_time : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
 /// A readable parse or query error. The library raises this instead of
 /// panicking on malformed VCD input or an invalid query.
 pub(all) suberror VcdError {

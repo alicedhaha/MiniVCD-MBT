@@ -16,6 +16,17 @@ pub fn find_signal(vcd : VcdFile, full_name : String) -> Signal? {
 }
 
 ///|
+/// Find a signal by raw VCD identifier.
+pub fn find_signal_by_identifier(vcd : VcdFile, identifier : String) -> Signal? {
+  for signal in vcd.signals {
+    if signal.identifier == identifier {
+      return Some(signal)
+    }
+  }
+  None
+}
+
+///|
 /// Get every change for a signal selected by full name.
 pub fn signal_changes(
   vcd : VcdFile,
@@ -24,6 +35,25 @@ pub fn signal_changes(
   let signal = match find_signal(vcd, full_name) {
     Some(signal) => signal
     None => raise VcdError("signal not found: \{full_name}")
+  }
+  let result : Array[SignalChange] = []
+  for change in vcd.changes {
+    if change.identifier == signal.identifier {
+      result.push(change)
+    }
+  }
+  result
+}
+
+///|
+/// Get every change for a signal selected by VCD identifier.
+pub fn signal_changes_by_identifier(
+  vcd : VcdFile,
+  identifier : String,
+) -> Array[SignalChange] raise VcdError {
+  let signal = match find_signal_by_identifier(vcd, identifier) {
+    Some(signal) => signal
+    None => raise VcdError("signal identifier not found: \{identifier}")
   }
   let result : Array[SignalChange] = []
   for change in vcd.changes {
@@ -54,6 +84,17 @@ pub fn value_at(
     }
   }
   result
+}
+
+///|
+/// Summarize file-wide counts and time bounds.
+pub fn summary(vcd : VcdFile) -> VcdSummary {
+  {
+    signal_count: vcd.signals.length(),
+    change_count: vcd.changes.length(),
+    start_time: start_time(vcd),
+    end_time: end_time(vcd),
+  }
 }
 
 ///|

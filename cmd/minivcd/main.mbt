@@ -42,12 +42,13 @@ fn run(args : Array[String]) -> Unit raise @vcdlib.VcdError {
         raise @vcdlib.VcdError("usage: minivcd info <file.vcd>")
       }
       let vcd = read_vcd(args[2])
+      let summary = @vcdlib.summary(vcd)
       println("VCD File")
       println("Timescale: \{vcd.timescale}")
-      println("Signals: \{vcd.signals.length()}")
-      println("Changes: \{vcd.changes.length()}")
-      println("Start time: \{show_time(@vcdlib.start_time(vcd))}")
-      println("End time: \{show_time(@vcdlib.end_time(vcd))}")
+      println("Signals: \{summary.signal_count}")
+      println("Changes: \{summary.change_count}")
+      println("Start time: \{show_time(summary.start_time)}")
+      println("End time: \{show_time(summary.end_time)}")
     }
     "signals" => {
       if args.length() != 3 {

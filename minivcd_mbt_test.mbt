@@ -293,6 +293,15 @@ test "find missing signal returns none" {
 }
 
 ///|
+test "find signal by identifier" {
+  let vcd = parse_ok(simple_vcd("#0 0!"))
+  assert_true(
+    @minivcd_mbt.find_signal_by_identifier(vcd, "!") is Some(signal) &&
+    signal.full_name == "top.clk",
+  )
+}
+
+///|
 test "list signals returns all declarations" {
   let vcd = parse_ok(
     "$var wire 1 ! a $end $var wire 1 ? b $end $enddefinitions $end",
@@ -321,6 +330,27 @@ test "signal changes missing signal raises error" {
   try @minivcd_mbt.signal_changes(vcd, "top.nope") catch {
     @minivcd_mbt.VcdError(message) =>
       assert_true(message.contains("signal not found"))
+  } noraise {
+    _ => panic()
+  }
+}
+
+///|
+test "signal changes by identifier" {
+  let vcd = parse_ok(simple_vcd("#0 0! #5 1!"))
+  let changes = @minivcd_mbt.signal_changes_by_identifier(vcd, "!") catch {
+    _ => panic()
+  }
+  assert_eq(changes.length(), 2)
+  assert_eq(changes[1].timestamp, 5L)
+}
+
+///|
+test "signal changes by identifier rejects missing identifier" {
+  let vcd = parse_ok(simple_vcd("#0 0!"))
+  try @minivcd_mbt.signal_changes_by_identifier(vcd, "?") catch {
+    @minivcd_mbt.VcdError(message) =>
+      assert_true(message.contains("identifier not found"))
   } noraise {
     _ => panic()
   }
@@ -471,6 +501,16 @@ test "start and end time" {
   let vcd = parse_ok(simple_vcd("#10 0! #25 1!"))
   assert_eq(@minivcd_mbt.start_time(vcd), Some(10L))
   assert_eq(@minivcd_mbt.end_time(vcd), Some(25L))
+}
+
+///|
+test "summary reports file counts and time bounds" {
+  let vcd = parse_ok(simple_vcd("#10 0! #25 1!"))
+  let summary = @minivcd_mbt.summary(vcd)
+  assert_eq(summary.signal_count, 1)
+  assert_eq(summary.change_count, 2)
+  assert_eq(summary.start_time, Some(10L))
+  assert_eq(summary.end_time, Some(25L))
 }
 
 ///|
