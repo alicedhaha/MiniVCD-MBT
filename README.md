@@ -14,8 +14,10 @@ intentionally a focused parser/viewer rather than a full EDA application.
 - Binary vectors
 - Signal lookup, change history, and point-in-time value queries
 - Change count and basic rising/falling edge statistics
+- File summary and identifier-based query helpers
 - CSV export
-- Five-command CLI
+- Single-signal CSV export
+- Six-command CLI
 
 ## Installation
 
@@ -53,6 +55,12 @@ Show one signal's changes:
 moon run cmd/minivcd -- changes examples/demo.vcd top.clk
 ```
 
+Show one signal's statistics:
+
+```bash
+moon run cmd/minivcd -- stats examples/demo.vcd top.clk
+```
+
 Query the most recent value at or before a timestamp:
 
 ```bash
@@ -65,7 +73,7 @@ Export all changes:
 moon run cmd/minivcd -- export examples/demo.vcd output.csv
 ```
 
-The standalone executable uses the same five commands with the shorter form
+The standalone executable uses the same commands with the shorter form
 `minivcd <command> ...`.
 
 ## Library Example
@@ -89,7 +97,9 @@ assert_eq(value, Some("1"))
 ```
 
 The main public functions are `parse_vcd`/`parse`, `list_signals`,
-`find_signal`, `signal_changes`, `value_at`, `signal_stats`, and `export_csv`.
+`find_signal`, `find_signal_by_identifier`, `signal_changes`,
+`signal_changes_by_identifier`, `value_at`, `summary`, `signal_stats`,
+`export_csv`, and `export_signal_csv`.
 
 ## Supported Features
 
@@ -99,7 +109,7 @@ The main public functions are `parse_vcd`/`parse`, `list_signals`,
 - Scalar digital changes
 - Binary vector changes
 - Non-negative timestamps
-- `$dumpvars` initial values
+- `$dumpvars`, `$dumpall`, `$dumpon`, and `$dumpoff` blocks
 
 Malformed input raises a readable `VcdError`; normal input errors do not panic.
 
@@ -128,6 +138,12 @@ For stricter local validation:
 moon check --deny-warn
 moon test --deny-warn
 ```
+
+## Contest Notes
+
+This repository is an original MoonBit implementation. The GitHub account
+`alicedhaha` and the GitLink account `alicedhh` both belong to the same
+contestant, Huang Donghong; the different names are only platform nicknames.
 
 ## License
 
