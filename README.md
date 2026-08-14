@@ -30,7 +30,7 @@ During development, run the CLI directly with `moon run cmd/minivcd -- ...`.
 After the package is published, library users can install it with:
 
 ```bash
-moon add 001-Elsa/minivcd_mbt
+moon add alicedhaha/minivcd_mbt
 ```
 
 ## Usage
@@ -70,7 +70,7 @@ The standalone executable uses the same five commands with the shorter form
 
 ## Library Example
 
-Add `001-Elsa/minivcd_mbt` to the consuming package's `moon.pkg`, then call the
+Add `alicedhaha/minivcd_mbt` to the consuming package's `moon.pkg`, then call the
 parser and query API:
 
 ```moonbit

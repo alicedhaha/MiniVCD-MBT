@@ -9,7 +9,7 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "001-Elsa/minivcd_mbt"
+name = "alicedhaha/minivcd_mbt"
 
 version = "0.1.0"
 

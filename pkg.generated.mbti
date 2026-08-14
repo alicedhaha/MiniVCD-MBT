@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "001-Elsa/minivcd_mbt"
+package "alicedhaha/minivcd_mbt"
 
 import {
   "moonbitlang/core/debug",
