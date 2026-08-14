@@ -434,6 +434,33 @@ test "dumpvars values are parsed at time zero" {
 }
 
 ///|
+test "dumpall values use current timestamp" {
+  let vcd = parse_ok(simple_vcd("#12 $dumpall 1! $end"))
+  assert_eq(vcd.changes.length(), 1)
+  assert_eq(vcd.changes[0].timestamp, 12L)
+  assert_eq(vcd.changes[0].value, "1")
+}
+
+///|
+test "dumpon accepts vector values" {
+  let text =
+    #|$scope module top $end
+    #|$var wire 4 # bus $end
+    #|$upscope $end
+    #|$enddefinitions $end
+    #|#9 $dumpon b10XZ # $end
+  let vcd = parse_ok(text)
+  assert_eq(vcd.changes.length(), 1)
+  assert_eq(vcd.changes[0].timestamp, 9L)
+  assert_eq(vcd.changes[0].value, "10xz")
+}
+
+///|
+test "unterminated dump command is rejected" {
+  expect_error(simple_vcd("$dumpall 0!"), "unterminated $dumpall command")
+}
+
+///|
 test "parse alias" {
   let vcd = @minivcd_mbt.parse(simple_vcd("#0 1!")) catch { _ => panic() }
   assert_eq(vcd.changes[0].value, "1")

@@ -146,6 +146,53 @@ fn normalize_vector(bits : String) -> String raise VcdError {
 }
 
 ///|
+fn parse_change_token(
+  tokens : Array[String],
+  i : Int,
+  current_time : Int64,
+  signals : Array[Signal],
+  changes : Array[SignalChange],
+) -> Int raise VcdError {
+  let token = tokens[i]
+  let first = match token.get_char(0) {
+    Some(ch) => ch
+    None => return i + 1
+  }
+  if first == 'b' || first == 'B' {
+    if i + 1 >= tokens.length() {
+      raise VcdError("invalid vector change: missing signal identifier")
+    }
+    let value = normalize_vector(token[1:].to_owned())
+    let identifier = tokens[i + 1]
+    if !identifier_exists(signals, identifier) {
+      raise VcdError("unknown signal identifier '\{identifier}'")
+    }
+    changes.push({ timestamp: current_time, identifier, value })
+    return i + 2
+  }
+  match normalize_scalar(first) {
+    Some(value) => {
+      let identifier = token[1:].to_owned()
+      if identifier.is_empty() {
+        raise VcdError("invalid scalar change: missing signal identifier")
+      }
+      let signal = match signal_by_identifier(signals, identifier) {
+        Some(signal) => signal
+        None => raise VcdError("unknown signal identifier '\{identifier}'")
+      }
+      if signal.width != 1 {
+        raise VcdError(
+          "invalid scalar change for \{signal.full_name}: width is \{signal.width}",
+        )
+      }
+      changes.push({ timestamp: current_time, identifier, value })
+      i + 1
+    }
+    None => raise VcdError("invalid signal value '\{token}'")
+  }
+}
+
+///|
 /// Parse a complete VCD document held in memory.
 pub fn parse_vcd(text : String) -> VcdFile raise VcdError {
   if text.trim().is_empty() {
@@ -247,7 +294,21 @@ pub fn parse_vcd(text : String) -> VcdFile raise VcdError {
       i = i + 1
       continue
     }
-    if token == "$dumpvars" || token == "$end" {
+    if token == "$end" {
+      i = i + 1
+      continue
+    }
+    if token == "$dumpvars" ||
+      token == "$dumpall" ||
+      token == "$dumpon" ||
+      token == "$dumpoff" {
+      i = i + 1
+      while i < tokens.length() && tokens[i] != "$end" {
+        i = parse_change_token(tokens, i, current_time, signals, changes)
+      }
+      if i >= tokens.length() {
+        raise VcdError("unterminated \{token} command")
+      }
       i = i + 1
       continue
     }
@@ -256,46 +317,7 @@ pub fn parse_vcd(text : String) -> VcdFile raise VcdError {
       i = next
       continue
     }
-    let first = match token.get_char(0) {
-      Some(ch) => ch
-      None => {
-        i = i + 1
-        continue
-      }
-    }
-    if first == 'b' || first == 'B' {
-      if i + 1 >= tokens.length() {
-        raise VcdError("invalid vector change: missing signal identifier")
-      }
-      let value = normalize_vector(token[1:].to_owned())
-      let identifier = tokens[i + 1]
-      if !identifier_exists(signals, identifier) {
-        raise VcdError("unknown signal identifier '\{identifier}'")
-      }
-      changes.push({ timestamp: current_time, identifier, value })
-      i = i + 2
-      continue
-    }
-    match normalize_scalar(first) {
-      Some(value) => {
-        let identifier = token[1:].to_owned()
-        if identifier.is_empty() {
-          raise VcdError("invalid scalar change: missing signal identifier")
-        }
-        let signal = match signal_by_identifier(signals, identifier) {
-          Some(signal) => signal
-          None => raise VcdError("unknown signal identifier '\{identifier}'")
-        }
-        if signal.width != 1 {
-          raise VcdError(
-            "invalid scalar change for \{signal.full_name}: width is \{signal.width}",
-          )
-        }
-        changes.push({ timestamp: current_time, identifier, value })
-        i = i + 1
-      }
-      None => raise VcdError("invalid signal value '\{token}'")
-    }
+    i = parse_change_token(tokens, i, current_time, signals, changes)
   }
   { date, version, timescale, signals, changes }
 }
