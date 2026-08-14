@@ -1,0 +1,52 @@
+# MiniVCD-MBT Acceptance Record
+
+Date: 2026-08-14
+
+## Environment
+
+- `moon 0.1.20260724`
+- `moonc v0.10.5`
+- `moonrun 0.1.20260724`
+
+## Reproduction Commands
+
+```bash
+moon fmt --check
+moon check --target all --deny-warn
+moon build --target all
+moon test --target all --deny-warn
+moon info
+git diff --exit-code
+moon run cmd/minivcd -- info examples/demo.vcd
+moon run cmd/minivcd -- signals examples/demo.vcd
+moon run cmd/minivcd -- changes examples/demo.vcd top.clk
+moon run cmd/minivcd -- stats examples/demo.vcd top.clk
+moon run cmd/minivcd -- value examples/demo.vcd top.counter 20
+moon run cmd/minivcd -- export examples/demo.vcd output.csv
+```
+
+## Actual Results
+
+- `moon fmt --check`: passed.
+- `moon check --target all --deny-warn`: passed for all targets.
+- `moon build --target all`: passed for all targets.
+- `moon test --target all --deny-warn`: passed 63/63 on `wasm`, `wasm-gc`, `js`, and `native`.
+- `moon info`: passed.
+- `git diff --exit-code`: passed after `moon info`.
+- `info`: `Timescale: 1ns`, `Signals: 3`, `Changes: 16`, `Start time: 0`, `End time: 40`.
+- `signals`: listed `top.clk`, `top.rst`, and `top.counter`.
+- `changes`: `top.clk` changes were `0, 5, 10, 15, 20, 25, 30, 35, 40`.
+- `stats`: `top.clk` reported `Changes: 9`, `Rising edges: 4`, `Falling edges: 4`.
+- `value`: `top.counter @ 20 = 0010`.
+- `export`: generated CSV with 16 rows of waveform changes.
+
+## Repository And Publish Status
+
+- GitHub repository: public, default branch `main`.
+- GitLink repository: `main` is up to date. `master` should be kept consistent or the default branch setting should be switched in the GitLink repository settings after login.
+- Mooncakes package: `alicedhaha/minivcd_mbt@0.1.1` published.
+
+## Notes
+
+- The GitHub account `alicedhaha` and GitLink account `alicedhh` both belong to contestant 黄东红.
+- The project is an original MoonBit implementation and uses the MIT License.
