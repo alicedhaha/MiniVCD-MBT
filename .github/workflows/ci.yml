@@ -14,6 +14,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
+      - name: Normalize git checkout settings
+        run: git config core.autocrlf false
+
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash

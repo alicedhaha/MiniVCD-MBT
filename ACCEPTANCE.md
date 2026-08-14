@@ -43,7 +43,7 @@ moon run cmd/minivcd -- export examples/demo.vcd output.csv
 ## Repository And Publish Status
 
 - GitHub repository: public, default branch `main`.
-- GitLink repository: `main` is up to date. `master` should be kept consistent or the default branch setting should be switched in the GitLink repository settings after login.
+- GitLink repository: `main` is up to date, and `master` has been synchronized to the same latest commit so the default page no longer points at stale content.
 - Mooncakes package: `alicedhaha/minivcd_mbt@0.1.1` published.
 
 ## Notes
