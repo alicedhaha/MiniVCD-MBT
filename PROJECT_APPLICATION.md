@@ -29,8 +29,13 @@ The project targets MoonBit application ecosystem and engineering tool construct
 4. Parse timestamped signal changes, including `$dumpvars`, `$dumpall`, `$dumpon`, and `$dumpoff` blocks.
 5. Provide query APIs for signals, per-signal changes, point-in-time values, and file summaries.
 6. Provide basic statistics including change count, first/last change time, rising edges, and falling edges.
-7. Export all changes or one signal's changes to CSV.
-8. Provide the `minivcd` CLI with `info`, `signals`, `changes`, `stats`, `value`, and `export` commands.
+7. Provide parsed-data diagnostics, signal coverage, timestamp buckets, snapshots, and Markdown/text reports.
+8. Export all changes or one signal's changes to CSV.
+9. Provide the `minivcd` CLI with `info`, `signals`, `changes`, `stats`, `value`, and `export` commands.
+
+## Current Scale And Tests
+
+The project now contains 4001 lines of effective MoonBit source code, including 2387 product-code lines and 1614 test-code lines. The test suite has 201 tests and covers parsing, malformed inputs, scalar/vector values, query APIs, statistics, CSV export, diagnostics, snapshots, coverage summaries, and Markdown reports.
 
 ## Originality And Compliance
 

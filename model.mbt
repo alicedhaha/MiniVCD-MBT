@@ -46,6 +46,129 @@ pub(all) struct VcdSummary {
 } derive(Eq, @debug.Debug)
 
 ///|
+/// One signal value observed at a selected timestamp.
+pub(all) struct SignalValue {
+  signal : Signal
+  value : String?
+} derive(Eq, @debug.Debug)
+
+///|
+/// A point-in-time view of every declared signal.
+pub(all) struct VcdSnapshot {
+  timestamp : Int64
+  values : Array[SignalValue]
+} derive(Eq, @debug.Debug)
+
+///|
+/// A compact report of one timestamp and the changes that happened there.
+pub(all) struct TimestampBucket {
+  timestamp : Int64
+  changes : Array[SignalChange]
+} derive(Eq, @debug.Debug)
+
+///|
+/// A normalized signal declaration summary suitable for reports.
+pub(all) struct SignalDescriptor {
+  identifier : String
+  name : String
+  full_name : String
+  width : Int
+  signal_type : String
+  scope : String
+  is_scalar : Bool
+  is_vector : Bool
+} derive(Eq, @debug.Debug)
+
+///|
+/// A validation issue discovered after parsing a VCD file.
+pub(all) struct VcdIssue {
+  code : String
+  message : String
+  timestamp : Int64?
+  signal : String?
+} derive(Eq, @debug.Debug)
+
+///|
+/// Counts of scalar/vector/unknown-state signals and changes.
+pub(all) struct VcdHealth {
+  signal_count : Int
+  scalar_signal_count : Int
+  vector_signal_count : Int
+  change_count : Int
+  unknown_value_change_count : Int
+  high_impedance_change_count : Int
+  issue_count : Int
+} derive(Eq, @debug.Debug)
+
+///|
+/// A search result produced by name, scope, type, or identifier queries.
+pub(all) struct SignalMatch {
+  signal : Signal
+  reason : String
+} derive(Eq, @debug.Debug)
+
+///|
+/// A transition between two consecutive known values of one signal.
+pub(all) struct SignalTransition {
+  timestamp : Int64
+  previous : String
+  current : String
+} derive(Eq, @debug.Debug)
+
+///|
+/// A half-open time interval over which a signal keeps the same value.
+pub(all) struct ValueSpan {
+  start_time : Int64
+  end_time : Int64?
+  value : String
+} derive(Eq, @debug.Debug)
+
+///|
+/// Count of a concrete value in a signal change history.
+pub(all) struct ValueCount {
+  value : String
+  count : Int
+} derive(Eq, @debug.Debug)
+
+///|
+/// Per-character counts for a scalar or vector logic value.
+pub(all) struct LogicCounts {
+  zeros : Int
+  ones : Int
+  unknowns : Int
+  high_impedances : Int
+  width : Int
+} derive(Eq, @debug.Debug)
+
+///|
+/// A per-signal coverage summary for review and diagnostics.
+pub(all) struct SignalCoverage {
+  full_name : String
+  has_value : Bool
+  first_change_time : Int64?
+  last_change_time : Int64?
+  change_count : Int
+  transition_count : Int
+  unknown_change_count : Int
+  high_impedance_change_count : Int
+} derive(Eq, @debug.Debug)
+
+///|
+/// A query window over VCD timestamps.
+pub(all) struct TimeWindow {
+  start_time : Int64
+  end_time : Int64
+} derive(Eq, @debug.Debug)
+
+///|
+/// A text rendering option bundle for CLI-style library reports.
+pub(all) struct RenderOptions {
+  include_header : Bool
+  include_empty_values : Bool
+  separator : String
+} derive(Eq, @debug.Debug)
+
+///|
 /// A readable parse or query error. The library raises this instead of
 /// panicking on malformed VCD input or an invalid query.
 pub(all) suberror VcdError {
