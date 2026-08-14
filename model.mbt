@@ -161,6 +161,41 @@ pub(all) struct TimeWindow {
 } derive(Eq, @debug.Debug)
 
 ///|
+/// Difference between the signal declarations of two parsed VCD files.
+pub(all) struct SignalSetDiff {
+  common : Array[String]
+  left_only : Array[String]
+  right_only : Array[String]
+  width_mismatches : Array[String]
+  type_mismatches : Array[String]
+} derive(Eq, @debug.Debug)
+
+///|
+/// Value difference for one signal at one timestamp.
+pub(all) struct ValueDiff {
+  timestamp : Int64
+  full_name : String
+  left : String?
+  right : String?
+} derive(Eq, @debug.Debug)
+
+///|
+/// Timestamp presence difference between two parsed VCD files.
+pub(all) struct TimestampDiff {
+  common : Array[Int64]
+  left_only : Array[Int64]
+  right_only : Array[Int64]
+} derive(Eq, @debug.Debug)
+
+///|
+/// Compact comparison between two parsed VCD files.
+pub(all) struct VcdDiff {
+  signal_diff : SignalSetDiff
+  timestamp_diff : TimestampDiff
+  value_diffs : Array[ValueDiff]
+} derive(Eq, @debug.Debug)
+
+///|
 /// A text rendering option bundle for CLI-style library reports.
 pub(all) struct RenderOptions {
   include_header : Bool

@@ -18,6 +18,7 @@ intentionally a focused parser/viewer rather than a full EDA application.
 - Signal descriptors, scope/type filtering, snapshots, timestamp buckets, and coverage summaries
 - Parsed-data validation diagnostics
 - Markdown and plain-text reports
+- VCD-to-VCD regression comparison for signal sets, timestamps, and values
 - CSV export
 - Single-signal CSV export
 - Six-command CLI
@@ -114,7 +115,7 @@ The main public functions are `parse_vcd`/`parse`, `list_signals`,
 - Non-negative timestamps
 - `$dumpvars`, `$dumpall`, `$dumpon`, and `$dumpoff` blocks
 - Point-in-time snapshots and timestamp buckets
-- Parsed-data validation, signal coverage summaries, and Markdown reports
+- Parsed-data validation, signal coverage summaries, Markdown reports, and VCD regression comparison helpers
 
 Malformed input raises a readable `VcdError`; normal input errors do not panic.
 
@@ -137,9 +138,9 @@ Run all tests with:
 moon test
 ```
 
-The repository currently includes 201 tests covering parser behavior, malformed
+The repository currently includes 240 tests covering parser behavior, malformed
 inputs, scalar/vector values, query APIs, statistics, CSV export, diagnostics,
-snapshots, coverage summaries, and Markdown reports.
+snapshots, coverage summaries, Markdown reports, and VCD comparison helpers.
 
 For stricter local validation:
 

@@ -32,7 +32,7 @@ moon run cmd/minivcd -- export examples/demo.vcd output.csv
 - `moon fmt --check`: passed.
 - `moon check --target all --deny-warn`: passed for all targets.
 - `moon build --target all`: passed for all targets.
-- `moon test --target all --deny-warn`: passed 201/201 on `wasm`, `wasm-gc`, `js`, and `native`.
+- `moon test --target all --deny-warn`: passed 240/240 on `wasm`, `wasm-gc`, `js`, and `native`.
 - `moon info`: passed.
 - `git diff --exit-code`: passed after `moon info`.
 - `info`: `Timescale: 1ns`, `Signals: 3`, `Changes: 16`, `Start time: 0`, `End time: 40`.
@@ -46,8 +46,9 @@ moon run cmd/minivcd -- export examples/demo.vcd output.csv
 
 - GitHub repository: public, default branch `main`.
 - GitLink repository: `main` is up to date, and `master` has been synchronized to the same latest commit so the default page no longer points at stale content.
-- Mooncakes package: `alicedhaha/minivcd_mbt@0.1.3` published.
-- MoonBit source scale: 4001 lines total, including 2387 product lines and 1614 test lines.
+- Mooncakes package: `alicedhaha/minivcd_mbt@0.1.4` published.
+- MoonBit source scale: 5378 physical lines, 4921 nonblank lines, and 4320 nonblank non-comment lines.
+- Strict effective split: 2518 product effective lines and 1802 test effective lines.
 
 ## Notes
 
